@@ -1,0 +1,221 @@
+//Handle drawing the gameboard
+
+class Gameboard {
+
+  function void drawTickDown(Array theArray, int dims, int xStart, int yStart) {
+     //So we need to erase the top pixel, and draw a new pixel at the bottom
+
+     var int i,j, drawY, drawX, val;
+     var Array row;
+
+     let i = 0;
+     while (i<dims) {
+
+       let row = theArray[i];
+       let j=0;  //Need to reset J each time
+
+       while (j<dims) {
+         let val = row[j];
+
+         if (val=1) {
+
+             let drawY = yStart + Math.multiply(i,12);
+             let drawX = xStart + Math.multiply(j,12);
+
+             //For our blocks we can actually start with a negative value, so we only want to draw if our Y value is >0
+             if (drawY+1>-1) {
+              //Erase the top sliver
+              //X still goes from 1 to 11, we just only want y to be 1 pixel high
+              do Screen.setColor(false);
+              do Screen.drawRectangle(drawX+1, drawY+1, drawX+11, drawY+1);
+              }
+
+            if ((drawY+12)>-1) {
+              do Screen.setColor(true);
+              do Screen.drawRectangle(drawX+1, drawY+12, drawX+11, drawY+12);
+
+             }
+         }
+         let j = j+1;
+       }
+       let i = i+1;
+    }
+  return;
+  }
+
+
+  function void drawArray(Array theArray, int xDims, int yDims, int xStart, int yStart, boolean color) {
+     //Draw or erase the individual blocks from any array - can be a piece, or our game grid
+
+     var int i,j, drawY, drawX, val, drawYVal;
+     var Array col;
+
+     do Screen.setColor(color);
+
+     let i = 0;
+     while (i<yDims) {
+
+       let col = theArray[i];
+       let j=0;  //Need to reset J each time
+
+       while (j<xDims) {
+         let val = col[j];
+
+         if (val=1) {
+             //For vertical we can start at the top, each I moves us down 12 pixels
+             //For horizontal we want a ???? offset, each J moves us over 12 pixels
+
+             let drawY = yStart + Math.multiply(i,12);
+             let drawX = xStart + Math.multiply(j,12);
+
+
+             //For our blocks we can actually start with a negative value, so we only want to draw if our Y value is >0
+             if (drawY+11>-1) {
+                //So if drawY is -5, we want to make sure the drawY+1 is > 0
+               let drawYVal = Math.max(drawY+1, 0);
+               do Screen.drawRectangle(drawX+1, drawYVal, drawX+11, drawY+11);
+             }
+
+         }
+         let j = j+1;
+       }
+       let i = i+1;
+    }
+  return;
+  }
+
+
+  function void eraseNextPiece() {
+    //Erase the area where we'll draw our next piece, so we can draw a new one
+
+    //We need the pixel location
+
+    //256x512
+    //11pixels high, 8 pixels wide
+    do Screen.setColor(false);
+    do Screen.drawRectangle(336, 58, 336+(12*4), 55+(12*4));
+
+    return;
+  }
+
+
+  function void drawNextPiece(Array theArray, int dims) {
+    //Draw the next piece in the proper location
+
+    do Gameboard.drawArray(theArray, dims, dims, 336, 58, true);
+    return;
+  }
+
+
+
+  //Initialize our game board visualization
+  function void drawBoard() {
+
+    //Instructions
+    do Output.moveCursor(6,1);
+    do Output.printString("a - Rotate Left");
+    do Output.moveCursor(7,1);
+    do Output.printString("d - Rotate Right");
+    do Output.moveCursor(8,1);
+    do Output.printString("LEFT - Move Left");
+    do Output.moveCursor(9,1);
+    do Output.printString("RIGHT - Move Right");
+    do Output.moveCursor(10,1);
+    do Output.printString("DOWN - Speed Down");
+    do Output.moveCursor(11,1);
+    do Output.printString("q - Quit");
+
+    //512 x 256
+    //Game board is 20x10, each of these 12 pixels
+    //So game board 240x120
+    //240 TALL, 120 WIDE
+
+    //512 -120 /2 = 196
+
+
+    do Screen.setColor(true);
+    //Vertical lines - 120 width, with offset
+    do Screen.drawRectangle(190, 0, 195, 255);
+    do Screen.drawRectangle(317, 0, 322, 255);
+    //Horizontal line - 240 height, goes to 16 pixels from bottom
+    do Screen.drawRectangle(195, 241, 317, 255);
+
+
+    //23 rows of 64 chars
+    //1 row down, 5 characters over
+
+
+    do Output.moveCursor(1,42);
+    do Output.printString("SCORE");
+    do Gameboard.updateScore(0);
+
+
+    do Output.moveCursor(4,42);
+    do Output.printString("NEXT");
+
+
+    do Output.moveCursor(10,42);
+    do Output.printString("LINES");
+    do Gameboard.updateLines(0);
+
+
+    return;
+    }
+
+  function void updateScore(int theScore) {
+    do Output.moveCursor(2,42);
+    do Output.printInt(theScore);
+    return;
+
+  }
+  function void updateLines(int numLines) {
+    do Output.moveCursor(11,42);
+    do Output.printInt(numLines);
+    return;
+  }
+
+
+  function void tetrisAnimation() {
+    //Animation to display on startup, and when the player gets a tetris
+
+    var int i;
+    let i=0;
+
+    while (i<3) {
+    do Output.moveCursor(2,6);
+    do Output.printString(" ");
+    do Sys.wait(30);
+    do Output.printString(" ");
+    do Sys.wait(30);
+    do Output.printString(" ");
+    do Sys.wait(30);
+    do Output.printString(" ");
+    do Sys.wait(30);
+    do Output.printString(" ");
+    do Sys.wait(30);
+    do Output.printString(" ");
+    do Sys.wait(30);
+    do Output.printString(" ");
+
+    do Output.moveCursor(2,6);
+    do Output.printString("T");
+    do Sys.wait(30);
+    do Output.printString("E");
+    do Sys.wait(30);
+    do Output.printString("T");
+    do Sys.wait(30);
+    do Output.printString("R");
+    do Sys.wait(30);
+    do Output.printString("I");
+    do Sys.wait(30);
+    do Output.printString("S");
+    do Sys.wait(30);
+    do Output.printString("!");
+
+    let i=i+1;
+    }
+
+    return;
+
+  }
+}

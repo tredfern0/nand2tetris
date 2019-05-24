@@ -1,0 +1,989 @@
+function Gameplay.new 1
+push constant 8
+call Memory.alloc 1
+pop pointer 0
+push pointer 0
+call Gameplay.buildGameboardArray 1
+pop temp 0
+call Gameboard.drawBoard 0
+pop temp 0
+push argument 0
+call RNG.new 1
+pop this 0
+push this 0
+call RNG.rand 1
+pop local 0
+call Piece.new 0
+pop this 1
+push this 1
+push local 0
+call Piece.buildNewPiece 2
+pop temp 0
+push pointer 0
+call Gameplay.setNextPiece 1
+pop temp 0
+push constant 232
+pop this 3
+push constant 24
+neg
+pop this 4
+push pointer 0
+return
+function Gameplay.buildGameboardArray 3
+push argument 0
+pop pointer 0
+push constant 10
+pop local 0
+push constant 20
+pop local 1
+push local 1
+call Array.new 1
+pop this 5
+push constant 0
+pop local 2
+label WHILE_EXP0
+push local 2
+push local 1
+lt
+not
+if-goto WHILE_END0
+push local 2
+push this 5
+add
+push local 0
+call Array.new 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 2
+push constant 1
+add
+pop local 2
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Gameplay.setNextPiece 3
+push argument 0
+pop pointer 0
+push this 0
+call RNG.rand 1
+pop local 0
+call Piece.new 0
+pop this 2
+push this 2
+push local 0
+call Piece.buildNewPiece 2
+pop temp 0
+call Gameboard.eraseNextPiece 0
+pop temp 0
+push this 2
+call Piece.getP 1
+pop local 2
+push this 2
+call Piece.getDims 1
+pop local 1
+push local 2
+push local 1
+call Gameboard.drawNextPiece 2
+pop temp 0
+push constant 0
+return
+function Gameplay.runGame 6
+push argument 0
+pop pointer 0
+label WHILE_EXP0
+push constant 0
+not
+not
+if-goto WHILE_END0
+push this 1
+call Piece.getDims 1
+pop local 0
+push this 1
+call Piece.getP 1
+pop local 1
+push pointer 0
+push this 3
+push this 4
+push constant 1
+add
+push local 0
+push local 1
+call Gameplay.collisionCheck 5
+pop local 2
+label WHILE_EXP1
+push local 2
+not
+not
+if-goto WHILE_END1
+push constant 10
+call Sys.wait 1
+pop temp 0
+push local 1
+push local 0
+push this 3
+push this 4
+call Gameboard.drawTickDown 4
+pop temp 0
+push this 4
+push constant 1
+add
+pop this 4
+call Keyboard.keyPressed 0
+pop local 5
+label WHILE_EXP2
+push local 5
+push constant 0
+eq
+not
+not
+if-goto WHILE_END2
+push local 5
+push constant 81
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+call Sys.halt 0
+pop temp 0
+label IF_FALSE0
+push local 5
+push constant 65
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push pointer 0
+push constant 1
+call Gameplay.rotate 2
+pop temp 0
+label WHILE_EXP3
+push local 5
+push constant 0
+eq
+not
+not
+if-goto WHILE_END3
+call Keyboard.keyPressed 0
+pop local 5
+goto WHILE_EXP3
+label WHILE_END3
+label IF_FALSE1
+push local 5
+push constant 68
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push pointer 0
+push constant 1
+neg
+call Gameplay.rotate 2
+pop temp 0
+label WHILE_EXP4
+push local 5
+push constant 0
+eq
+not
+not
+if-goto WHILE_END4
+call Keyboard.keyPressed 0
+pop local 5
+goto WHILE_EXP4
+label WHILE_END4
+label IF_FALSE2
+push local 5
+push constant 133
+eq
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push pointer 0
+call Gameplay.jumpDown 1
+pop temp 0
+label IF_FALSE3
+push local 5
+push constant 130
+eq
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push pointer 0
+push constant 12
+neg
+call Gameplay.jump 2
+pop temp 0
+label WHILE_EXP5
+push local 5
+push constant 0
+eq
+not
+not
+if-goto WHILE_END5
+call Keyboard.keyPressed 0
+pop local 5
+goto WHILE_EXP5
+label WHILE_END5
+label IF_FALSE4
+push local 5
+push constant 132
+eq
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push pointer 0
+push constant 12
+call Gameplay.jump 2
+pop temp 0
+label WHILE_EXP6
+push local 5
+push constant 0
+eq
+not
+not
+if-goto WHILE_END6
+call Keyboard.keyPressed 0
+pop local 5
+goto WHILE_EXP6
+label WHILE_END6
+label IF_FALSE5
+push constant 80
+call Sys.wait 1
+pop temp 0
+call Keyboard.keyPressed 0
+pop local 5
+goto WHILE_EXP2
+label WHILE_END2
+push this 1
+call Piece.getDims 1
+pop local 0
+push this 1
+call Piece.getP 1
+pop local 1
+push pointer 0
+push this 3
+push this 4
+push constant 1
+add
+push local 0
+push local 1
+call Gameplay.collisionCheck 5
+pop local 2
+goto WHILE_EXP1
+label WHILE_END1
+push pointer 0
+push local 1
+push local 0
+call Gameplay.insertPieceToBoard 3
+pop local 3
+push local 3
+if-goto IF_TRUE6
+goto IF_FALSE6
+label IF_TRUE6
+call Sys.halt 0
+pop temp 0
+label IF_FALSE6
+push pointer 0
+call Gameplay.checkBoard 1
+pop local 4
+push local 4
+if-goto IF_TRUE7
+goto IF_FALSE7
+label IF_TRUE7
+push constant 0
+call Screen.setColor 1
+pop temp 0
+push constant 196
+push constant 0
+push constant 316
+push constant 240
+call Screen.drawRectangle 4
+pop temp 0
+push this 5
+push constant 10
+push constant 20
+push constant 196
+push constant 0
+push constant 0
+not
+call Gameboard.drawArray 6
+pop temp 0
+label IF_FALSE7
+push this 2
+pop this 1
+push constant 232
+pop this 3
+push constant 24
+neg
+pop this 4
+push pointer 0
+call Gameplay.setNextPiece 1
+pop temp 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Gameplay.insertPieceToBoard 7
+push argument 0
+pop pointer 0
+push this 4
+call Gameplay.inBetweenCheck 1
+pop local 0
+push local 0
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+return
+label IF_FALSE0
+push this 3
+push constant 196
+sub
+push constant 12
+call Math.divide 2
+pop local 3
+push this 4
+push constant 12
+call Math.divide 2
+pop local 4
+label WHILE_EXP0
+push local 5
+push argument 2
+lt
+not
+if-goto WHILE_END0
+push local 5
+push argument 1
+add
+pop pointer 1
+push that 0
+pop local 1
+push local 5
+push local 4
+add
+push constant 1
+neg
+gt
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push local 5
+push local 4
+add
+push this 5
+add
+pop pointer 1
+push that 0
+pop local 2
+label IF_FALSE1
+push constant 0
+pop local 6
+label WHILE_EXP1
+push local 6
+push argument 2
+lt
+not
+if-goto WHILE_END1
+push local 6
+push local 1
+add
+pop pointer 1
+push that 0
+push constant 1
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push local 5
+push local 4
+add
+push constant 0
+lt
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push constant 0
+not
+return
+label IF_FALSE3
+push local 6
+push local 3
+add
+push local 2
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+label IF_FALSE2
+push local 6
+push constant 1
+add
+pop local 6
+goto WHILE_EXP1
+label WHILE_END1
+push local 5
+push constant 1
+add
+pop local 5
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Gameplay.inBetweenCheck 2
+push argument 0
+push constant 12
+call Math.divide 2
+pop local 0
+push local 0
+push constant 12
+call Math.multiply 2
+pop local 1
+push local 1
+push argument 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+return
+label IF_FALSE0
+push constant 0
+not
+return
+function Gameplay.collisionCheck 9
+push argument 0
+pop pointer 0
+push argument 2
+call Gameplay.inBetweenCheck 1
+pop local 3
+push argument 1
+push constant 196
+sub
+push constant 12
+call Math.divide 2
+pop local 4
+push argument 2
+push constant 12
+call Math.divide 2
+pop local 5
+push local 3
+push argument 2
+push constant 0
+lt
+and
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 5
+push constant 1
+sub
+pop local 5
+label IF_FALSE0
+push constant 0
+pop local 7
+label WHILE_EXP0
+push local 7
+push argument 3
+lt
+not
+if-goto WHILE_END0
+push local 7
+push argument 4
+add
+pop pointer 1
+push that 0
+pop local 1
+push local 7
+push local 5
+add
+push constant 20
+lt
+push local 7
+push local 5
+add
+push constant 1
+neg
+gt
+and
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push local 7
+push local 5
+add
+push this 5
+add
+pop pointer 1
+push that 0
+pop local 0
+label IF_FALSE1
+push constant 0
+pop local 8
+label WHILE_EXP1
+push local 8
+push argument 3
+lt
+not
+if-goto WHILE_END1
+push local 8
+push local 1
+add
+pop pointer 1
+push that 0
+push constant 1
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push local 7
+push local 5
+add
+push constant 19
+gt
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push constant 0
+not
+return
+label IF_FALSE3
+push local 8
+push local 4
+add
+pop local 6
+push local 6
+push constant 0
+lt
+push local 6
+push constant 9
+gt
+or
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push constant 0
+not
+return
+label IF_FALSE4
+push local 7
+push local 5
+add
+push constant 1
+neg
+gt
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push local 6
+push local 0
+add
+pop pointer 1
+push that 0
+push constant 1
+eq
+if-goto IF_TRUE6
+goto IF_FALSE6
+label IF_TRUE6
+push constant 0
+not
+return
+label IF_FALSE6
+label IF_FALSE5
+push local 3
+if-goto IF_TRUE7
+goto IF_FALSE7
+label IF_TRUE7
+push local 7
+push local 5
+add
+push constant 1
+add
+push constant 19
+gt
+if-goto IF_TRUE8
+goto IF_FALSE8
+label IF_TRUE8
+push constant 0
+not
+return
+label IF_FALSE8
+push local 7
+push local 5
+add
+push constant 1
+add
+push constant 1
+neg
+gt
+if-goto IF_TRUE9
+goto IF_FALSE9
+label IF_TRUE9
+push local 7
+push local 5
+add
+push constant 1
+add
+push this 5
+add
+pop pointer 1
+push that 0
+pop local 2
+push local 6
+push local 2
+add
+pop pointer 1
+push that 0
+push constant 1
+eq
+if-goto IF_TRUE10
+goto IF_FALSE10
+label IF_TRUE10
+push constant 0
+not
+return
+label IF_FALSE10
+label IF_FALSE9
+label IF_FALSE7
+label IF_FALSE2
+push local 8
+push constant 1
+add
+pop local 8
+goto WHILE_EXP1
+label WHILE_END1
+push local 7
+push constant 1
+add
+pop local 7
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Gameplay.checkBoard 7
+push argument 0
+pop pointer 0
+push constant 0
+pop local 6
+push constant 0
+pop local 2
+push constant 19
+pop local 3
+label WHILE_EXP0
+push local 3
+push constant 1
+neg
+gt
+not
+if-goto WHILE_END0
+push constant 0
+pop local 4
+push constant 0
+pop local 0
+push local 3
+push this 5
+add
+pop pointer 1
+push that 0
+pop local 1
+label WHILE_EXP1
+push local 4
+push constant 10
+lt
+not
+if-goto WHILE_END1
+push local 4
+push local 1
+add
+pop pointer 1
+push that 0
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+not
+pop local 0
+label IF_FALSE0
+push local 4
+push constant 1
+add
+pop local 4
+goto WHILE_EXP1
+label WHILE_END1
+push local 0
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push local 3
+push constant 1
+sub
+pop local 3
+push constant 0
+pop local 2
+goto IF_END1
+label IF_FALSE1
+push constant 0
+not
+pop local 6
+push local 3
+pop local 5
+label WHILE_EXP2
+push local 5
+push constant 0
+gt
+not
+if-goto WHILE_END2
+push local 5
+push this 5
+add
+push local 5
+push constant 1
+sub
+push this 5
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 5
+push constant 1
+sub
+pop local 5
+goto WHILE_EXP2
+label WHILE_END2
+push constant 0
+push this 5
+add
+push constant 10
+call Array.new 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 2
+push constant 1
+add
+pop local 2
+push this 6
+push constant 100
+add
+pop this 6
+push this 6
+call Gameboard.updateScore 1
+pop temp 0
+push this 7
+push constant 1
+add
+pop this 7
+push this 7
+call Gameboard.updateLines 1
+pop temp 0
+push local 2
+push constant 4
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push this 6
+push constant 400
+add
+pop this 6
+push constant 0
+pop local 2
+call Gameboard.tetrisAnimation 0
+pop temp 0
+label IF_FALSE2
+label IF_END1
+goto WHILE_EXP0
+label WHILE_END0
+push local 6
+return
+function Gameplay.rotate 5
+push argument 0
+pop pointer 0
+call Piece.new 0
+pop local 0
+push argument 1
+push constant 0
+gt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 0
+push this 1
+call Piece.buildFromLeftRotate 2
+pop temp 0
+goto IF_END0
+label IF_FALSE0
+push local 0
+push this 1
+call Piece.buildFromRightRotate 2
+pop temp 0
+label IF_END0
+push local 0
+call Piece.getP 1
+pop local 1
+push local 0
+call Piece.getDims 1
+pop local 3
+push pointer 0
+push this 3
+push this 4
+push local 3
+push local 1
+call Gameplay.collisionCheck 5
+pop local 4
+push local 4
+not
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push this 1
+call Piece.getP 1
+pop local 2
+push local 2
+push local 3
+push local 3
+push this 3
+push this 4
+push constant 0
+call Gameboard.drawArray 6
+pop temp 0
+push local 1
+push local 3
+push local 3
+push this 3
+push this 4
+push constant 0
+not
+call Gameboard.drawArray 6
+pop temp 0
+push local 0
+pop this 1
+label IF_FALSE1
+push constant 0
+return
+function Gameplay.jumpDown 4
+push argument 0
+pop pointer 0
+push this 1
+call Piece.getDims 1
+pop local 1
+push this 1
+call Piece.getP 1
+pop local 2
+push this 4
+push constant 12
+call Math.divide 2
+pop local 0
+push local 0
+push constant 1
+add
+push constant 12
+call Math.multiply 2
+pop local 0
+push pointer 0
+push this 3
+push local 0
+push local 1
+push local 2
+call Gameplay.collisionCheck 5
+pop local 3
+push local 3
+not
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 2
+push local 1
+push local 1
+push this 3
+push this 4
+push constant 0
+call Gameboard.drawArray 6
+pop temp 0
+push local 0
+pop this 4
+push local 2
+push local 1
+push local 1
+push this 3
+push this 4
+push constant 0
+not
+call Gameboard.drawArray 6
+pop temp 0
+label IF_FALSE0
+push constant 0
+return
+function Gameplay.jump 3
+push argument 0
+pop pointer 0
+push this 1
+call Piece.getDims 1
+pop local 0
+push this 1
+call Piece.getP 1
+pop local 1
+push pointer 0
+push this 3
+push argument 1
+add
+push this 4
+push local 0
+push local 1
+call Gameplay.collisionCheck 5
+pop local 2
+push local 2
+not
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 1
+push local 0
+push local 0
+push this 3
+push this 4
+push constant 0
+call Gameboard.drawArray 6
+pop temp 0
+push this 3
+push argument 1
+add
+pop this 3
+push local 1
+push local 0
+push local 0
+push this 3
+push this 4
+push constant 0
+not
+call Gameboard.drawArray 6
+pop temp 0
+label IF_FALSE0
+push constant 0
+return
+function Gameplay.dispose 0
+push argument 0
+pop pointer 0
+push this 0
+call RNG.dispose 1
+pop temp 0
+push this 1
+call Piece.dispose 1
+pop temp 0
+push this 2
+call Piece.dispose 1
+pop temp 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return

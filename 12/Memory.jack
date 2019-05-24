@@ -1,0 +1,101 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */
+class Memory {
+
+    static Array ram;
+
+    /** Initializes the class. */
+    function void init() {
+        let ram = 0;
+
+        let ram[2048] = 14334;  //Remaining free size of heap
+        let ram[2049] = 2050;  //freeList - start address
+
+        return;
+    }
+
+    /** Returns the RAM value at the given address. */
+    function int peek(int address) {
+        return ram[address];
+    }
+
+    /** Sets the RAM value at the given address to the given value. */
+    function void poke(int address, int value) {
+        let ram[address] = value;
+        return;
+    }
+
+    /** Finds an available RAM block of the given size and returns
+     *  a reference to its base address. */
+    function int alloc(int size) {
+
+        var Array currAddress;  //current address
+
+        if (size<1) {
+            do Sys.error(5);
+        }
+
+        let currAddress = 2048;
+
+        while (currAddress[0] < size) {
+            let currAddress = currAddress[1];
+        }
+
+        if ((currAddress+size)>16379) {
+            do Sys.error(6);
+        }
+
+        //Now we've found our block
+        if (currAddress[0]>(size+2)) {
+            let currAddress[size+2] = currAddress[0]-size-2;
+
+            if (currAddress[1]=(currAddress+2)) {
+                let currAddress[size+3] = currAddress+size+4;
+            }
+            else {
+                let currAddress[size+3] = currAddress[1];
+            }
+
+            let currAddress[1] = currAddress + size + 2;
+        }
+
+        let currAddress[0] = 0;
+        return currAddress+2;
+    }
+
+
+    /** De-allocates the given object (cast as an array) by making
+     *  it available for future allocations. */
+    function void deAlloc(Array o) {
+        //We would append this block to the free list
+        var int currAddress;
+        var int matchAddress;
+
+        let currAddress = o-2;
+        let matchAddress = currAddress[1];
+
+        if (matchAddress[0]=0) {
+            let currAddress[0] = currAddress[1] - currAddress-2;
+       }
+
+       else {
+            let currAddress[0] = currAddress[1] - currAddress + matchAddress[0];
+            if (matchAddress[1]=(matchAddress+2)) {
+                let currAddress[1] = currAddress+2;
+            }
+            else {
+                let currAddress[1] = matchAddress[1];
+            }
+        }
+
+        return;
+    }
+}

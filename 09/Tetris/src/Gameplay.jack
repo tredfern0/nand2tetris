@@ -1,0 +1,532 @@
+
+// Main game loop
+// Drop a piece, listen for key presses, move piece and check for valid movies
+
+class Gameplay {
+
+  field RNG rng;
+
+  field Piece currentPieceObj, nextPieceObj;
+  field int locX, locY;  //Location of our currentPiece
+  field Array gBoard;
+  field int score, numLines;  //Game score
+
+  constructor Gameplay new(int rngKey) {
+    //Set initial pieces, gameboard
+    var int randNum;
+
+    do buildGameboardArray();
+
+    //Draw the board setup
+    do Gameboard.drawBoard();
+
+    //Initialize our random number generator with the key the player presses at startup
+    let rng = RNG.new(rngKey);
+
+    //Get random number and build our first piece
+    let randNum = rng.rand();
+    let currentPieceObj = Piece.new();
+    do currentPieceObj.buildNewPiece(randNum);
+
+    //Do the same for our next piece (and draw it)
+    do setNextPiece();
+
+    //Set the location of our currentPiece to being slightly above the screen
+    let locX = 232;
+    let locY = -24;  //Two blocks above, should work for all of them
+
+    return this;
+  }
+
+
+  method void buildGameboardArray() {
+    //Create 20x10 array to represent our board
+
+    var int width, height, i;
+
+    let width = 10;
+    let height = 20;
+
+    let gBoard = Array.new(height);
+
+    let i = 0;
+    while (i<height) {
+      let gBoard[i] = Array.new(width);
+      let i = i+1;
+    }
+    return;
+  }
+
+
+  method void setNextPiece() {
+    var int randNum, dims;
+    var Array theArray;
+
+    //Get random number and build piece
+    let randNum = rng.rand();
+    let nextPieceObj = Piece.new();
+    do nextPieceObj.buildNewPiece(randNum);
+
+    do Gameboard.eraseNextPiece();
+
+    let theArray = nextPieceObj.getP();
+    let dims = nextPieceObj.getDims();
+
+    do Gameboard.drawNextPiece(theArray, dims);
+    return;
+  }
+
+
+  method void runGame() {
+    //Take current piece, drop 1 pixel at a time, check for collision logic at each step
+
+    var int dims;
+    var Array gamePiece;
+    var boolean hit, endGame;
+    var boolean mustRedraw;
+
+    var int key;
+
+    //Infinite loop - play until we lose!
+    while (true) {
+
+    let dims = currentPieceObj.getDims();
+    let gamePiece = currentPieceObj.getP();
+
+    let hit = collisionCheck(locX, locY+1, dims, gamePiece);
+    while (~(hit)) {
+
+      do Sys.wait(10);
+
+      //Draw piece update using more efficient function, 1 pixel down
+      do Gameboard.drawTickDown(gamePiece, dims, locX, locY);
+
+      //Move piece down by 1 pixel
+      let locY = locY+1;
+
+      let key = Keyboard.keyPressed();
+      while (~(key=0)) {
+
+        if (key = 81)  { do Sys.halt(); }     // q key
+
+        //Not the best solution - we want to let down key remain pressed, but not the others
+
+        if (key = 65)  {
+            do rotate(1);
+            while (~(key=0)){
+              let key = Keyboard.keyPressed();
+            }
+            } // a key
+        if (key = 68)  {
+            do rotate(-1);
+            while (~(key=0)){
+              let key = Keyboard.keyPressed();
+            }
+            } // d key
+        if (key = 133) { do jumpDown(); }   // down arrow - can hold this down, require repeated presses of others?
+        if (key = 130) {
+            do jump(-12);
+            while (~(key=0)){
+              let key = Keyboard.keyPressed();
+            }
+            }   // left arrow
+        if (key = 132) {
+            do jump(12);
+            while (~(key=0)){
+              let key = Keyboard.keyPressed();
+            }
+            }   // right arrow
+
+
+        do Sys.wait(80);
+        let key = Keyboard.keyPressed();
+
+        //Can do actions in a loop if we want?  Could just shift piece back and forth and buy time
+        //
+      }
+
+
+      //Confirm we can still move piece down 1 pixel, if not basic loop ends
+      let dims = currentPieceObj.getDims();
+      let gamePiece = currentPieceObj.getP();
+
+      let hit = collisionCheck(locX, locY+1, dims, gamePiece);  //If next move isn't valid, keep piece where it is
+
+      }
+
+
+
+    //Once we have HIT -
+    //check for end of game - if location of piece is ABOVE top of screen, quit
+
+    let endGame = insertPieceToBoard(gamePiece, dims);
+    if (endGame) {
+        //Just quit?
+        do Sys.halt();
+    }
+
+
+    //check for completed lines, update board, handle scoring for that
+    let mustRedraw = checkBoard();
+    //We completed a line so need to redraw the board
+    if (mustRedraw) {
+
+      //Erase the entire center area
+      do Screen.setColor(false);
+      do Screen.drawRectangle(196, 0, 316, 240);
+
+      //Redraw the array
+      do Gameboard.drawArray(gBoard, 10, 20, 196, 0, true);
+    }
+
+
+    //Adjusts the pieces forward
+    let currentPieceObj = nextPieceObj;
+    //Set the location of our currentPiece to being slightly above the screen
+    let locX = 232;
+    let locY = -24;  //Two blocks above, should work for all of them
+    do setNextPiece();
+
+
+    }
+    return;
+  }
+
+
+  method boolean insertPieceToBoard(Array gamePiece, int dims) {
+    //if location of piece is ABOVE top of screen, game is over
+    //Need to look at x,y coordinates to see
+
+    //Try to insert the current piece location into the board
+
+    //If any pixels are out of bounds, GAME OVER
+
+    var boolean inBetweenBool;
+    var Array pieceRow, gameBoardRow;
+    var int gridXOffset, gridYOffset;
+    var int i,j;
+
+    //This should ALWAYS fail, we should always be at an even point for this to be true
+    let inBetweenBool = Gameplay.inBetweenCheck(locY);
+    if (inBetweenBool) {
+      return false;
+    }
+
+    let gridXOffset = (locX-196) / 12;
+    let gridYOffset = (locY/12);
+
+    while (i<dims) {
+
+      let pieceRow = gamePiece[i];
+
+      //It's ok if we're in negative territory, as long as piece is empty there
+      if ((i+gridYOffset)>-1) {
+        let gameBoardRow = gBoard[i+gridYOffset];
+      }
+
+      let j=0;
+      while (j < dims) {
+        //If we
+        if (pieceRow[j]=1){
+
+            //Check for block above starting point - game over
+            if ((i+gridYOffset)<0) {
+              return true;
+            }
+
+            //Otherwise we should have already confirmed that it's safe to insert here, so can insert
+            let gameBoardRow[j+gridXOffset] = 1;
+            }
+          let j=j+1;
+        }
+        let i=i+1;
+      }
+
+    return false;
+  }
+
+
+
+  function boolean inBetweenCheck(int y) {
+    //See if the current y coordinate is equal to the block being lined up perfectly on the grid
+    //Which would be the case if it was evenly divisible by 12
+
+    var int even, res;
+    let even = y/12;
+    let res = even*12;
+    if (res=y) {
+      return false;
+    }
+    return true;
+  }
+
+
+
+  method boolean collisionCheck(int x, int y, int dims, Array gamePiece) {
+    //See if a hypothetical move would cause a collision with our current game board
+
+    var Array gameBoardRow, pieceRow, gameBoardRow2;
+    var boolean inBetweenBool;
+
+    var int gridXOffset, gridYOffset;
+    var int convertedXIndex;
+    var int i, j;
+
+
+    //Whether it's at an even value (divisible by 12) or not
+    let inBetweenBool = Gameplay.inBetweenCheck(y);
+
+    //Get location of piece inside of board
+    let gridXOffset = (x-196) / 12;
+    let gridYOffset = (y/12);
+
+    if (inBetweenBool & (y<0)) {
+      let gridYOffset=gridYOffset-1;
+    }
+
+
+    //Wherever we have a 1 in the piece we're checking, we need to check that-
+    //It's inside the valid game area (empty parts of piece can go out of bounds, that is ok)
+    //It's not overlapping any existing blocks in our game structure
+
+    //If our gridYOffset is NEGATIVE, we still need to confirm the piece isn't too far left/right
+
+    let i=0;
+
+    while (i < dims) {
+
+      let pieceRow = gamePiece[i];
+
+      //Need this because we can go completely out of bounds by pressing down
+      if (((i+gridYOffset)<20) & ((i+gridYOffset)>-1)) {
+        let gameBoardRow = gBoard[i+gridYOffset];
+      }
+
+      let j=0;
+
+      while (j < dims) {
+
+        //If there is a solid here in our piece, check for collision
+        if (pieceRow[j]=1){
+
+            if ((i+gridYOffset)>19) {
+              return true;
+            }
+
+            //Adjusted X index value for our game grid
+            let convertedXIndex = j+gridXOffset;
+
+            //Outside of game board left/right case - if j+offset < 0 or j+offset > 9 - error
+            if ((convertedXIndex<0) | (convertedXIndex>9)) {
+              return true;
+            }
+
+            //Only do these checks for in-bound pieces
+            if ((i+gridYOffset)>-1) {
+              //Collision with game board case - if same point in game board has a value here
+              if (gameBoardRow[convertedXIndex]=1) {
+                  return true;
+              }
+            }
+
+            //If we're in-between, we have to check the gameBoard block below
+            if (inBetweenBool) {
+
+              //Check to see if this would put us past the bottom of the board
+              if ((i+gridYOffset+1)>19) {
+                return true;
+              }
+
+              if ((i+gridYOffset+1)>-1) {
+
+              //Check to see if the board space below has a value
+              let gameBoardRow2 = gBoard[i+gridYOffset+1];
+              if (gameBoardRow2[convertedXIndex]=1) {
+                 return true;
+              }
+              }
+
+            }
+
+
+        }
+
+        let j = j+1;
+      }
+
+      let i = i+1;
+
+    }
+    //If we made it to the end, no conflict
+    return false;
+  }
+
+
+  method boolean checkBoard() {
+    //functionality for checking for completed lines, and updating board
+
+    //Easiest to iterate up from the bottom
+
+    var boolean notComplete;
+    var Array row;
+    var int tetrisCheck, i, j, i2;
+    var boolean mustRedraw;
+
+    let mustRedraw = false;
+
+    let tetrisCheck = 0;
+
+    let i=19;
+    while (i>-1){
+      let j=0;
+      let notComplete = false;
+      let row = gBoard[i];
+
+         while (j<10) {
+            if (row[j]=0) {
+              let notComplete = true;
+            }
+            let j=j+1;
+         }
+
+
+         if (notComplete) {
+         //If the line wasn't complete, decrement i and keep going
+           let i=i-1;
+           let tetrisCheck = 0;  //Reset tetris check
+         }
+         //Otherwise - move ALL VALUES DOWN!
+         else {
+
+            let mustRedraw = true;  //a single completed line is enough for us to need to redraw
+
+            let i2 = i;
+            while (i2>0) {
+              let gBoard[i2] = gBoard[i2-1];
+              let i2 = i2-1;
+            }
+
+            //Initialize new row of 0s
+            let gBoard[0] = Array.new(10);
+
+            //Need to increment our line count, and score
+
+            // A single line clear in Tetris Zone is worth 100 points, clearing four lines at once (known as a Tetris) is worth 800
+            let tetrisCheck = tetrisCheck+1;
+            let score = score + 100;
+            do Gameboard.updateScore(score);
+            let numLines = numLines+1;
+            do Gameboard.updateLines(numLines);
+
+            if (tetrisCheck=4) {
+              let score = score + 400;  //We'll have already added 400 from the other lines
+              let tetrisCheck=0;
+              do Gameboard.tetrisAnimation();
+
+            }
+         }
+      }
+      return mustRedraw;
+    }
+
+
+  method void rotate(int direction) {
+    //Generate a new rotated piece, see if we can accept it.  If so - delete old piece, redraw new piece, replace old piece
+
+    var Piece pc2;
+    var Array theArray, gamePiece;
+    var int dims;
+    var boolean hit;
+
+    let pc2 = Piece.new();
+    if (direction>0){
+      do pc2.buildFromLeftRotate(currentPieceObj);
+    }
+    else {
+      do pc2.buildFromRightRotate(currentPieceObj);
+    }
+
+    let theArray = pc2.getP();
+    let dims = pc2.getDims();
+
+    let hit = collisionCheck(locX, locY, dims, theArray);  //If next move isn't valid, keep piece where it is
+    if (~hit) {
+
+      let gamePiece = currentPieceObj.getP();
+
+      //Erase old piece
+      do Gameboard.drawArray(gamePiece, dims, dims, locX, locY, false);
+
+      //Draw new piece
+      do Gameboard.drawArray(theArray, dims, dims, locX, locY, true);
+
+      //Overwrite current piece object
+      let currentPieceObj = pc2;
+    }
+
+    return;
+  }
+
+
+  method void jumpDown() {
+    var int testPosition;
+
+    var int dims;
+    var Array gamePiece;
+    var boolean hit;
+
+    let dims = currentPieceObj.getDims();
+    let gamePiece = currentPieceObj.getP();
+
+    let testPosition = locY/12;
+    //We want to try jumping down by 1 full spot
+    let testPosition = (testPosition+1)*12;
+
+    let hit = collisionCheck(locX, testPosition, dims, gamePiece);  //If next move isn't valid, keep piece where it is
+    if (~hit) {
+      //Erase old piece
+      do Gameboard.drawArray(gamePiece, dims, dims, locX, locY, false);
+
+      let locY = testPosition;
+
+      //Draw new piece
+      do Gameboard.drawArray(gamePiece, dims, dims, locX, locY, true);
+    }
+
+    return;
+  }
+
+
+  method void jump(int pixels) {
+    //Can jump left/right
+
+    var int dims;
+    var Array gamePiece;
+    var boolean hit;
+
+    let dims = currentPieceObj.getDims();
+    let gamePiece = currentPieceObj.getP();
+
+    let hit = collisionCheck(locX+pixels, locY, dims, gamePiece);  //If next move isn't valid, keep piece where it is
+    if (~hit) {
+      //Erase old piece
+      do Gameboard.drawArray(gamePiece, dims, dims, locX, locY, false);
+
+      let locX = locX+pixels;
+
+      //Draw new piece
+      do Gameboard.drawArray(gamePiece, dims, dims, locX, locY, true);
+    }
+    return;
+  }
+
+
+  method void dispose() {
+      do rng.dispose();
+      do currentPieceObj.dispose();
+      do nextPieceObj.dispose();
+      do Memory.deAlloc(this);
+      return;
+      }
+
+}

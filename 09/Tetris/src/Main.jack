@@ -1,0 +1,30 @@
+class Main {
+    function void main() {
+
+        var int key;
+        var Gameplay game;
+
+        do Output.moveCursor(8,11);
+        do Output.printString("WELCOME TO TETRIS");
+
+        do Output.moveCursor(12,11);
+        do Output.printString("PRESS ANY KEY TO BEGIN...");
+
+        //Get a random key for our RNG
+        let key = Keyboard.keyPressed();
+        while (key=0) {
+            let key = Keyboard.keyPressed();
+        }
+
+        do Screen.clearScreen();
+
+        do Gameboard.tetrisAnimation();
+
+        let game = Gameplay.new(key);
+        do game.runGame();
+
+        do game.dispose();
+
+        return;
+    }
+}

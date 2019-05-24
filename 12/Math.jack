@@ -1,0 +1,186 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Math.jack
+
+/**
+ * A library of commonly used mathematical functions.
+ * Note: Jack compilers implement multiplication and division using OS method calls.
+ */
+class Math {
+
+    static Array twoToThe;
+
+    /** Initializes the library. */
+    function void init() {
+
+        var int incr;
+
+        let twoToThe = Array.new(16);
+        let twoToThe[0] = 1;
+
+        let incr = 0;
+
+        while (incr < 15) {
+            let incr = incr + 1;
+            let twoToThe[incr] = twoToThe[incr-1] + twoToThe[incr-1];
+        }
+    return;
+    }
+
+
+    /** Returns the integer part of x/y.
+     *  When a Jack compiler detects the multiplication operator '/' in the
+     *  program's code, it handles it by invoking this method. In other words,
+     *  the Jack expressions x/y and divide(x,y) return the same value.
+     */
+    function int divide(int x, int y) {
+
+      var int q;
+      var boolean invert;
+      let invert = false;
+      if (x<0) {
+        let x = Math.abs(x);
+        let invert = ~invert;
+      }
+      if (y<0) {
+        let y = Math.abs(y);
+        let invert = ~invert;
+      }
+
+      if (y>x) {
+          return 0;
+      }
+      let q = Math.divide(x, 2*y);
+      if (invert) {
+        let q = -q;
+      }
+
+      if ((x - (2 * q * y)) < y) {
+          return 2*q;
+      }
+      return (2*q)+1;
+
+    }
+
+
+    /** Returns the integer part of the square root of x. */
+    function int sqrt(int x) {
+        var int counter;
+        var int poss;
+        var int val;
+        var int result;
+
+        if (x<0) {
+            do Sys.error(4);
+        }
+        let counter = 7; //We're squaring the numbers, so if we start too high we'll get an overflow
+
+        while (counter>-1) {
+            let poss = result + twoToThe[counter];
+
+            let val = Math.multiply(poss, poss);
+
+            if (~((val > x)) & (~(val < 0))) {
+                let result = poss;
+            }
+            let counter = counter - 1;
+        }
+        return result;
+    }
+
+
+    /** Returns the absolute value of x. */
+    function int abs(int x) {
+    if (x<0) {
+        let x = -x;
+    }
+    return x;
+    }
+
+
+    function boolean bit(int x, int i) {
+    // Returns true of the i-th bit of x is 1, false otherwise
+
+    //Note that this only works for the largest digit, so we'll have to iterate backwards and subtract as necessary
+
+    if (x> (twoToThe[i]-1)) {
+        return true;
+    }
+    return false;
+    }
+
+
+    /** Returns the product of x and y.
+     *  When a Jack compiler detects the multiplication operator '*' in the
+     *  program's code, it handles it by invoking this method. In other words,
+     *  the Jack expressions x*y and multiply(x,y) return the same value.
+     */
+
+    function int multiply(int x, int y) {
+
+        var int sum;
+        var int i;
+        var boolean zeroBit;
+        var int iVal;
+        var boolean invert;
+
+        var int shiftedX;
+        var int currX;
+        var Array shiftedX;
+        let shiftedX = Array.new(16);
+        let i = 0;
+        let currX = x;
+        while (i<16) {
+            let shiftedX[i] = currX;
+            let currX = currX+currX;
+            let i=i+1;
+        }
+
+        let sum = 0;  //Initialize sum to 0
+        let iVal=15;
+
+        let invert=false;
+        //Check for negative y
+        if (y<0) {
+            let y = Math.abs(y);
+            let invert=true;
+        }
+
+        while (iVal>-1) {
+            let zeroBit = Math.bit(y, iVal);
+            //This needs to be here - each time if we have a zero bit, we need to reduce by this value
+            if (zeroBit) {
+                //We also need to reduce y
+                let y = y - twoToThe[iVal];
+
+                //INEFFICIENT - try to figure out how to avoid this, could use an array but still seems ugly
+
+                let sum = sum+shiftedX[iVal];
+            }
+            let iVal = iVal-1;
+        }
+        if (invert) {
+            let sum = -sum;
+        }
+        return sum;
+    }
+
+
+    /** Returns the greater number. */
+    function int max(int a, int b) {
+    if (a>b) {
+        return a;
+    }
+    return b;
+    }
+
+
+    /** Returns the smaller number. */
+    function int min(int a, int b) {
+    if (a<b) {
+        return a;
+    }
+    return b;
+    }
+}

@@ -1,0 +1,306 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Screen.jack
+
+/**
+ * A library of functions for displaying graphics on the screen.
+ * The Hack physical screen consists of 512 rows (indexed 0..511, top to bottom)
+ * of 256 pixels each (indexed 0..255, left to right). The top left pixel on
+ * the screen is indexed (0,0).
+ */
+class Screen {
+
+    static Array arr16;
+    static Array screenLoc;
+    static boolean colorBool;  //Current color to be used by all commands?
+
+    /** Initializes the Screen. */
+    function void init() {
+        var int locIter;
+
+        let screenLoc = 16384;
+        let colorBool = true;  //Initialize current color to false/white
+
+        let arr16 = Array.new(17);  //16x16
+        let arr16[0] = 1;
+
+        while (locIter < 16) {
+            let locIter = locIter+1;
+            let arr16[locIter] = arr16[locIter-1] + arr16[locIter-1];
+        }
+        return;
+    }
+
+    /** Erases the entire screen. */
+    function void clearScreen() {
+        var int locIter;
+        while (locIter<8192) {
+            let screenLoc[locIter] = 0;
+            let locIter = locIter + 1;
+        }
+
+        return;
+    }
+
+    function void updateLocation(int coords, int col) {
+        if (colorBool) {
+            let screenLoc[coords] = (screenLoc[coords] | col);
+        }
+        else {
+            let screenLoc[coords] = (screenLoc[coords] & ~col);
+        }
+        return;
+    }
+
+    /** Sets the current color, to be used for all subsequent drawXXX commands.
+     *  Black is represented by true, white by false. */
+    function void setColor(boolean b) {
+        let colorBool = b;
+        return;
+    }
+
+    /** Draws the (x,y) pixel, using the current color. */
+    function void drawPixel(int x, int y) {
+        var int divi;
+        var int remai;
+        var int val;
+
+        if ((x<0) | (x>511) | (y<0) | (y>255)) {
+            do Sys.error(7);
+        }
+
+        let divi = x/16;
+        let remai = x - (divi * 16);
+
+        let val = Math.multiply(y,32) + divi;
+
+        do Screen.updateLocation(val, arr16[remai]);
+
+        return;
+    }
+
+    function void drawConditional(int x, int y, boolean bl) {
+        if (bl) {
+            do Screen.drawPixel(y,x);
+        }
+        else {
+            do Screen.drawPixel(x,y);
+        }
+        return;
+    }
+
+    /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
+    function void drawLine(int x1, int y1, int x2, int y2) {
+
+        var int y_draw;
+        var int x_draw;
+        var int ylen;
+        var int xlen;
+        var int tmp_swap;
+        var int ytrack;
+        var boolean y_longer_bool;
+        var boolean increase_bool;
+        var int max_x;
+        var int ylen2;
+        var int xydiff2;
+
+        if ((x1<0) | (x2>511) | (y1<0) | (y2>255)) {
+            do Sys.error(8);
+        }
+
+        let xlen = Math.abs(x2-x1);
+        let ylen = Math.abs(y2-y1);
+
+        let y_longer_bool = xlen < ylen;
+
+        if ((y_longer_bool & (y2<y1)) | (~y_longer_bool & (x2<x1))) {
+            let tmp_swap = x1;
+            let x1 = x2;
+            let x2 = tmp_swap;
+            let tmp_swap = y1;
+            let y1 = y2;
+            let y2 = tmp_swap;
+        }
+
+        if (y_longer_bool) {
+            let tmp_swap = xlen;
+            let xlen = ylen;
+            let ylen = tmp_swap;
+            let x_draw = y1;
+            let y_draw = x1;
+            let max_x = y2;
+            let increase_bool = x1>x2;
+        }
+        else {
+            let x_draw = x1;
+            let y_draw = y1;
+            let max_x = x2;
+            let increase_bool = y1>y2;
+        }
+
+        let ytrack = Math.multiply(2,ylen) - xlen;
+        let ylen2 = Math.multiply(2,ylen);
+        let xydiff2 = Math.multiply(2, ylen-xlen);
+        do Screen.drawConditional(x_draw, y_draw, y_longer_bool);
+
+        while (x_draw<max_x) {
+            if (ytrack<0) {
+                let ytrack = ytrack + ylen2;
+            }
+            else {
+                let ytrack = ytrack + xydiff2;
+
+                if (increase_bool) {
+                    let y_draw = y_draw - 1;
+                }
+                else {
+                    let y_draw = y_draw + 1;
+                }
+            }
+            let x_draw = x_draw + 1;
+            do Screen.drawConditional(x_draw, y_draw, y_longer_bool);
+        }
+
+        return;
+    }
+
+    /** Draws a filled rectangle whose top left corner is (x1, y1)
+     * and bottom right corner is (x2,y2), using the current color. */
+    function void drawRectangle(int x1, int y1, int x2, int y2) {
+        var int coordsA;
+        var int coordsB;
+        var int rowlen;
+        var int rowxI;
+        var int rowX2I;
+        var int colB;
+        var int colA;
+        var int rowInd;
+        var int row2Ind;
+
+        if ((x1>x2) | (y1>y2) | (x1<0) | (x2>511) | (y1<0) | (y2>255)) {
+            do Sys.error(9);
+        }
+
+        let rowxI = Math.divide(x1,16);
+        let rowInd = x1 - Math.multiply(rowxI, 16);
+        let rowX2I = Math.divide(x2, 16);
+        let row2Ind = x2 - Math.multiply(rowX2I, 16);
+
+        let colA = ~(arr16[rowInd] - 1);
+        let colB = arr16[row2Ind+1] - 1;
+        let coordsA = Math.multiply(y1, 32) + rowxI;
+        let rowlen = rowX2I-rowxI;
+
+        while (~(y1>y2)) {
+            let coordsB = coordsA+rowlen;
+            if (rowlen=0) {
+                do Screen.updateLocation(coordsA, colB & colA);
+            }
+            else {
+                do Screen.updateLocation(coordsA, colA);
+
+                let coordsA = coordsA + 1;
+                while (coordsA < coordsB) {
+                    do Screen.updateLocation(coordsA, -1);
+                    let coordsA = coordsA + 1;
+                }
+                do Screen.updateLocation(coordsB, colB);
+            }
+
+            let y1 = y1+1;
+            let coordsA = coordsB + 32 - rowlen;
+        }
+
+        return;
+    }
+
+    function void drawHorizontal(int x, int y, int z) {
+        var int coords;
+        var int offset1;
+        var int offset2;
+        var int coordsF;
+        var int colA;
+        var int colB;
+        var int offsetF;
+        var int yz_min;
+        var int yz_max;
+        var int indA;
+        var int indB;
+
+        let yz_min = Math.min(y, z);
+        let yz_max = Math.max(y, z);
+
+        if ((x > -1) & (x < 256) & (yz_min < 512) & (yz_max > -1)) {
+
+            let yz_min = Math.max(yz_min, 0);
+            let yz_max = Math.min(yz_max, 511);
+            let offset1 = Math.divide(yz_min, 16);
+            let indA = yz_min - Math.multiply(offset1, 16);
+            let offset2 = Math.divide(yz_max, 16);
+            let indB = yz_max - Math.multiply(offset2, 16);
+            let colB = ~(arr16[indA] - 1);
+            let colA = arr16[indB+1] - 1;
+            let coords = Math.multiply(x, 32) + offset1;
+            let offsetF = offset2 - offset1;
+            let coordsF = coords + offsetF;
+            if (offsetF=0) {
+                do Screen.updateLocation(coords, colA & colB);
+            }
+
+            else {
+                do Screen.updateLocation(coords, colB);
+                let coords = coords + 1;
+                while (coords < coordsF) {
+                    do Screen.updateLocation(coords, -1);
+                    let coords = coords + 1;
+                }
+                do Screen.updateLocation(coordsF, colA);
+            }
+        }
+        return;
+    }
+
+    function void drawSymetric (int x, int y, int r1, int r2) {
+        do Screen.drawHorizontal(y-r2, x+r1, x-r1);
+        do Screen.drawHorizontal(y+r2, x+r1, x-r1);
+        do Screen.drawHorizontal(y-r1, x-r2, x+r2);
+        do Screen.drawHorizontal(y+r1, x-r2, x+r2);
+        return;
+    }
+
+    /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
+    function void drawCircle(int x, int y, int r) {
+        var int currRadius;
+        var int radA;
+        var int radB;
+
+        if ((x<0) | (x>511) | (y<0) | (y>255)) {
+            do Sys.error(12);
+        }
+
+        if (((x-r)<0) | ((x+r)>511) | ((y-r)<0) | ((y+r)>255)) {
+            do Sys.error(13);
+        }
+
+        let radA = r;
+        let radB = 1 - r;
+
+        do Screen.drawSymetric(x,y,currRadius, radA);
+
+        while (radA>currRadius) {
+            if (radB<0) {
+                let radB = radB + Math.multiply(2, currRadius) + 3;
+
+            }
+            else {
+            let radB = radB + Math.multiply(2, currRadius-radA) + 5;
+            let radA = radA - 1;
+            }
+
+            let currRadius = currRadius + 1;
+            do Screen.drawSymetric(x,y,currRadius, radA);
+        }
+        return;
+    }
+}

@@ -1,0 +1,44 @@
+//Generates pseudorandom numbers
+class RNG {
+
+  field int random_state;
+  field int random_adder;
+
+  constructor RNG new(int seed) {
+    let random_state = 1;
+    let random_adder = seed;
+
+    return this;
+  }
+
+  method void dispose() {
+     do Memory.deAlloc(this);
+     return;
+  }
+
+
+  method int rand() {
+      var int rand_num, base, div;
+
+      //Want (random_state+random_adder)%7
+      let base = random_state + random_adder;
+      let div = base/7;
+      let rand_num = base - (div*7);
+
+      if (random_state>5000) {
+        let random_state = 1;
+      }
+      else {
+        let random_state = random_state*3;
+      }
+
+      if (random_adder>1000) {
+        let random_adder = 0;
+      }
+      else {
+        let random_adder = random_adder + 2;
+      }
+
+      return rand_num;
+  }
+}

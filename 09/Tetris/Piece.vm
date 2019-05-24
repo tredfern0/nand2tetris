@@ -1,0 +1,612 @@
+function Piece.new 0
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push pointer 0
+return
+function Piece.getPieceArray 2
+push argument 0
+call Array.new 1
+pop local 1
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push argument 0
+lt
+not
+if-goto WHILE_END0
+push local 0
+push local 1
+add
+push argument 0
+call Array.new 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push local 1
+return
+function Piece.buildNewPiece 1
+push argument 0
+pop pointer 0
+push argument 1
+push constant 0
+lt
+push argument 1
+or
+push constant 6
+gt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 1
+call Sys.error 1
+pop temp 0
+label IF_FALSE0
+push argument 1
+push constant 0
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 4
+pop this 0
+push constant 4
+call Piece.getPieceArray 1
+pop this 1
+push constant 1
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push constant 0
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 3
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+return
+label IF_FALSE1
+push argument 1
+push constant 1
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push constant 3
+pop this 0
+push constant 3
+call Piece.getPieceArray 1
+pop this 1
+push constant 0
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push constant 0
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push constant 0
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+return
+label IF_FALSE2
+push argument 1
+push constant 2
+eq
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push constant 3
+pop this 0
+push constant 3
+call Piece.getPieceArray 1
+pop this 1
+push constant 0
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push constant 2
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push constant 0
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+return
+label IF_FALSE3
+push argument 1
+push constant 3
+eq
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push constant 2
+pop this 0
+push constant 2
+call Piece.getPieceArray 1
+pop this 1
+push constant 0
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push constant 0
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push constant 0
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+return
+label IF_FALSE4
+push argument 1
+push constant 4
+eq
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push constant 3
+pop this 0
+push constant 3
+call Piece.getPieceArray 1
+pop this 1
+push constant 0
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push constant 1
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push constant 0
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+return
+label IF_FALSE5
+push argument 1
+push constant 5
+eq
+if-goto IF_TRUE6
+goto IF_FALSE6
+label IF_TRUE6
+push constant 3
+pop this 0
+push constant 3
+call Piece.getPieceArray 1
+pop this 1
+push constant 0
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push constant 1
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push constant 0
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+return
+label IF_FALSE6
+push argument 1
+push constant 6
+eq
+if-goto IF_TRUE7
+goto IF_FALSE7
+label IF_TRUE7
+push constant 3
+pop this 0
+push constant 3
+call Piece.getPieceArray 1
+pop this 1
+push constant 0
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push constant 0
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push constant 1
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+return
+label IF_FALSE7
+push constant 0
+return
+function Piece.buildFromRightRotate 5
+push argument 0
+pop pointer 0
+push argument 1
+call Piece.getDims 1
+pop this 0
+push constant 4
+call Piece.getPieceArray 1
+pop this 1
+push argument 1
+call Piece.getP 1
+pop local 4
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push this 0
+lt
+not
+if-goto WHILE_END0
+push constant 0
+pop local 1
+push local 0
+push local 4
+add
+pop pointer 1
+push that 0
+pop local 2
+label WHILE_EXP1
+push local 1
+push this 0
+lt
+not
+if-goto WHILE_END1
+push local 1
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 3
+push this 0
+push local 0
+sub
+push constant 1
+sub
+push local 3
+add
+push local 1
+push local 2
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 1
+push constant 1
+add
+pop local 1
+goto WHILE_EXP1
+label WHILE_END1
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Piece.buildFromLeftRotate 5
+push argument 0
+pop pointer 0
+push argument 1
+call Piece.getDims 1
+pop this 0
+push constant 4
+call Piece.getPieceArray 1
+pop this 1
+push argument 1
+call Piece.getP 1
+pop local 4
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push this 0
+lt
+not
+if-goto WHILE_END0
+push constant 0
+pop local 1
+push local 0
+push local 4
+add
+pop pointer 1
+push that 0
+pop local 2
+label WHILE_EXP1
+push local 1
+push this 0
+lt
+not
+if-goto WHILE_END1
+push this 0
+push local 1
+sub
+push constant 1
+sub
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 3
+push local 0
+push local 3
+add
+push local 1
+push local 2
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 1
+push constant 1
+add
+pop local 1
+goto WHILE_EXP1
+label WHILE_END1
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Piece.getP 0
+push argument 0
+pop pointer 0
+push this 1
+return
+function Piece.getDims 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function Piece.dispose 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return

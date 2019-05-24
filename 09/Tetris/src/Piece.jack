@@ -1,0 +1,191 @@
+//Want this class to contain all the basic functionality related to a piece
+//Return a new piece, rotate an existing piece (by returning new piece)
+
+class Piece {
+
+  field int dims;
+  field Array p;
+
+  constructor Piece new() {
+    return this;
+  }
+
+  function Array getPieceArray(int dims) {
+    //Create a new 2d array to represent a piece
+    var int i;
+    var Array newArr;
+
+    let newArr = Array.new(dims);
+    let i = 0;
+    while (i<dims) {
+      let newArr[i] = Array.new(dims);
+      let i = i+1;
+    }
+    return newArr;
+  }
+
+  method void buildNewPiece(int id) {
+    var Array row;
+
+    //Error handling
+    if (id<0 | id>6) {
+      do Sys.error(1);
+    }
+
+    //Corresponding to tetrix pieces from http://tetris.wikia.com/wiki/File:SRS-pieces.png
+    //Down the list, set arrays, fill in values
+    if (id=0) {
+      let dims = 4;
+      let p = Piece.getPieceArray(4);
+      let row = p[1];
+      let row[0]=1;
+      let row[1]=1;
+      let row[2]=1;
+      let row[3]=1;
+      return;
+    }
+
+    if (id=1) {
+      let dims = 3;
+      let p = Piece.getPieceArray(3);
+      let row = p[0];
+      let row[0]=1;
+      let row = p[1];
+      let row[0]=1;
+      let row[1]=1;
+      let row[2]=1;
+      return;
+    }
+
+    if (id=2) {
+      let dims = 3;
+      let p = Piece.getPieceArray(3);
+      let row = p[0];
+      let row[2]=1;
+      let row = p[1];
+      let row[0]=1;
+      let row[1]=1;
+      let row[2]=1;
+      return;
+    }
+
+    if (id=3) {
+      let dims = 2;
+      let p = Piece.getPieceArray(2);
+      let row = p[0];
+      let row[0]=1;
+      let row[1]=1;
+      let row = p[1];
+      let row[0]=1;
+      let row[1]=1;
+      return;
+    }
+
+    if (id=4) {
+      let dims = 3;
+      let p = Piece.getPieceArray(3);
+      let row = p[0];
+      let row[1]=1;
+      let row[2]=1;
+      let row = p[1];
+      let row[0]=1;
+      let row[1]=1;
+      return;
+    }
+
+    if (id=5) {
+      let dims = 3;
+      let p = Piece.getPieceArray(3);
+      let row = p[0];
+      let row[1]=1;
+      let row = p[1];
+      let row[0]=1;
+      let row[1]=1;
+      let row[2]=1;
+      return;
+    }
+
+    if (id=6) {
+      let dims = 3;
+      let p = Piece.getPieceArray(3);
+      let row = p[0];
+      let row[0]=1;
+      let row[1]=1;
+      let row = p[1];
+      let row[1]=1;
+      let row[2]=1;
+      return;
+    }
+
+    return;
+  }
+
+
+  method void buildFromRightRotate(Piece t) {
+    //Let us generate our array based on another piece
+    var int i, j;
+    var Array oldRow, newRow, currPiece;
+
+    let dims = t.getDims();
+    let p = Piece.getPieceArray(4);
+
+    //Need to get the array corresponding to the current piece
+    let currPiece = t.getP();
+
+    let i=0;
+    while (i<dims) {
+      let j=0;
+      let oldRow = currPiece[i];
+
+      while (j<dims) {
+        let newRow = p[j];
+
+        let newRow[dims-i-1] = oldRow[j];
+        let j=j+1;
+      }
+      let i=i+1;
+    }
+    return;
+  }
+
+
+  method void buildFromLeftRotate(Piece t) {
+    var int i, j;
+    var Array oldRow, newRow, currPiece;
+
+    let dims = t.getDims();
+    let p = Piece.getPieceArray(4);
+
+    //Need to get the array corresponding to the current piece
+    let currPiece = t.getP();
+
+    let i=0;
+    while (i<dims) {
+      let j=0;
+      let oldRow = currPiece[i];
+
+      while (j<dims) {
+        let newRow = p[dims-j-1];
+
+        let newRow[i] = oldRow[j];
+        let j=j+1;
+      }
+      let i=i+1;
+    }
+    return;
+  }
+
+  method Array getP() {
+    return p;
+  }
+
+  method Array getDims() {
+    return dims;
+  }
+
+  method void dispose() {
+    do Memory.deAlloc(this);
+    return;
+  }
+
+}
