@@ -5,7 +5,7 @@ Course descriptions from Coursera -
 
 Part 1 - 
 
-In this project-centered course* you will build a modern computer system, from the ground up. We’ll divide this fascinating journey into six hands-on projects that will take you from constructing elementary logic gates all the way through creating a fully functioning general purpose computer. In the process, you will learn - in the most direct and constructive way - how computers work, and how they are designed.
+In this project-centered course you will build a modern computer system, from the ground up. We’ll divide this fascinating journey into six hands-on projects that will take you from constructing elementary logic gates all the way through creating a fully functioning general purpose computer. In the process, you will learn - in the most direct and constructive way - how computers work, and how they are designed.
 
 Part 2 - 
 
@@ -13,13 +13,10 @@ In this project-centered course you will build a modern software hierarchy, desi
 
 End result - 
 
-<img src="images/tetris.png" width="200" height="200">
+<img src="images/tetris.png" width="800" height="582">
 
 Certificates -
 
 https://www.coursera.org/account/accomplishments/certificate/4M9D4UVJJCZS
 
 https://www.coursera.org/account/accomplishments/certificate/7BFYEZBU3KWY
-
-<img src="images/cert1.png" width="200" height="200">
-<img src="images/cert2.png" width="200" height="200">
